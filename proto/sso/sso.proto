@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package auth;
 
-option go_package = "github.com/GolangLessons/proto/auth";
+option go_package = "tuzov.sso.v1;ssov1";
 
 // Auth is service for managing permissions and roles.
 service Auth {
