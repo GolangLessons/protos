@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "github.com/GolangLessons/proto/auth";
+
+// Auth is service for managing permissions and roles.
+service Auth {
+  // Register registers a new user.
+  rpc Register (RegisterRequest) returns (RegisterResponse);
+  // Login logs in a user and returns an auth token.
+  rpc Login (LoginRequest) returns (LoginResponse);
+  // IsAdmin validates if a user is authorized for admin-level operations.
+  rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
+}
+
+message IsAdminRequest {
+  string user_id = 1; // User ID to validate.
+}
+
+message IsAdminResponse {
+  bool is_admin = 1;  // Indicates whether the user is an admin.
+}
+
+message RegisterRequest {
+  string email = 1; // Email of the user to register.
+}
+
+message RegisterResponse {
+  string user_id = 1; // User ID of the registered user.
+}
+
+message LoginRequest {
+  string email = 1; // Email of the user to login.
+  string password = 2; // Password of the user to login.
+}
+
+message LoginResponse {
+  string user_id = 1; // User ID of the logged in user.
+}
