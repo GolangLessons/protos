@@ -1,4 +1,4 @@
-module protos
+module github.com/JustSkiv/protos
 
 go 1.21
 
