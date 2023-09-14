@@ -26,8 +26,6 @@ type AuthClient interface {
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	// Login logs in a user and returns an auth token.
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginResponse, error)
-	// IsAdmin validates if a user is authorized for admin-level operations.
-	IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error)
 }
 
 type authClient struct {
@@ -56,15 +54,6 @@ func (c *authClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.C
 	return out, nil
 }
 
-func (c *authClient) IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error) {
-	out := new(IsAdminResponse)
-	err := c.cc.Invoke(ctx, "/auth.Auth/IsAdmin", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // AuthServer is the server API for Auth service.
 // All implementations must embed UnimplementedAuthServer
 // for forward compatibility
@@ -73,8 +62,6 @@ type AuthServer interface {
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	// Login logs in a user and returns an auth token.
 	Login(context.Context, *LoginRequest) (*LoginResponse, error)
-	// IsAdmin validates if a user is authorized for admin-level operations.
-	IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error)
 	mustEmbedUnimplementedAuthServer()
 }
 
@@ -87,9 +74,6 @@ func (UnimplementedAuthServer) Register(context.Context, *RegisterRequest) (*Reg
 }
 func (UnimplementedAuthServer) Login(context.Context, *LoginRequest) (*LoginResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
-}
-func (UnimplementedAuthServer) IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAdmin not implemented")
 }
 func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
 
@@ -140,24 +124,6 @@ func _Auth_Login_Handler(srv interface{}, ctx context.Context, dec func(interfac
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_IsAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(IsAdminRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(AuthServer).IsAdmin(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/auth.Auth/IsAdmin",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).IsAdmin(ctx, req.(*IsAdminRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -173,9 +139,93 @@ var Auth_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "Login",
 			Handler:    _Auth_Login_Handler,
 		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "sso/sso.proto",
+}
+
+// PermissionsClient is the client API for Permissions service.
+//
+// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+type PermissionsClient interface {
+	// IsAdmin validates if a user is authorized for admin-level operations.
+	IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error)
+}
+
+type permissionsClient struct {
+	cc grpc.ClientConnInterface
+}
+
+func NewPermissionsClient(cc grpc.ClientConnInterface) PermissionsClient {
+	return &permissionsClient{cc}
+}
+
+func (c *permissionsClient) IsAdmin(ctx context.Context, in *IsAdminRequest, opts ...grpc.CallOption) (*IsAdminResponse, error) {
+	out := new(IsAdminResponse)
+	err := c.cc.Invoke(ctx, "/auth.Permissions/IsAdmin", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// PermissionsServer is the server API for Permissions service.
+// All implementations must embed UnimplementedPermissionsServer
+// for forward compatibility
+type PermissionsServer interface {
+	// IsAdmin validates if a user is authorized for admin-level operations.
+	IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error)
+	mustEmbedUnimplementedPermissionsServer()
+}
+
+// UnimplementedPermissionsServer must be embedded to have forward compatible implementations.
+type UnimplementedPermissionsServer struct {
+}
+
+func (UnimplementedPermissionsServer) IsAdmin(context.Context, *IsAdminRequest) (*IsAdminResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method IsAdmin not implemented")
+}
+func (UnimplementedPermissionsServer) mustEmbedUnimplementedPermissionsServer() {}
+
+// UnsafePermissionsServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to PermissionsServer will
+// result in compilation errors.
+type UnsafePermissionsServer interface {
+	mustEmbedUnimplementedPermissionsServer()
+}
+
+func RegisterPermissionsServer(s grpc.ServiceRegistrar, srv PermissionsServer) {
+	s.RegisterService(&Permissions_ServiceDesc, srv)
+}
+
+func _Permissions_IsAdmin_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsAdminRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PermissionsServer).IsAdmin(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/auth.Permissions/IsAdmin",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PermissionsServer).IsAdmin(ctx, req.(*IsAdminRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Permissions_ServiceDesc is the grpc.ServiceDesc for Permissions service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var Permissions_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "auth.Permissions",
+	HandlerType: (*PermissionsServer)(nil),
+	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "IsAdmin",
-			Handler:    _Auth_IsAdmin_Handler,
+			Handler:    _Permissions_IsAdmin_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
