@@ -10,9 +10,14 @@ service Auth {
   rpc Register (RegisterRequest) returns (RegisterResponse);
   // Login logs in a user and returns an auth token.
   rpc Login (LoginRequest) returns (LoginResponse);
+}
+
+// Permissions is service for managing permissions.
+service Permissions {
   // IsAdmin validates if a user is authorized for admin-level operations.
   rpc IsAdmin (IsAdminRequest) returns (IsAdminResponse);
 }
+
 
 message IsAdminRequest {
   string user_id = 1; // User ID to validate.
