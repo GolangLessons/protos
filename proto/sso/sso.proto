@@ -40,6 +40,4 @@ message LoginRequest {
   string password = 2; // Password of the user to login.
 }
 
-message LoginResponse {
-  string user_id = 1; // User ID of the logged in user.
-}
+message LoginResponse {}
