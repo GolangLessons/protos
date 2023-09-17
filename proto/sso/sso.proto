@@ -40,4 +40,6 @@ message LoginRequest {
   string password = 2; // Password of the user to login.
 }
 
-message LoginResponse {}
+message LoginResponse {
+  string token = 1; // Auth token of the logged in user.
+}
