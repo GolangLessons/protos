@@ -20,7 +20,7 @@ service Permissions {
 
 
 message IsAdminRequest {
-  string user_id = 1; // User ID to validate.
+  int64 user_id = 1; // User ID to validate.
 }
 
 message IsAdminResponse {
@@ -33,7 +33,7 @@ message RegisterRequest {
 }
 
 message RegisterResponse {
-  string user_id = 1; // User ID of the registered user.
+  int64 user_id = 1; // User ID of the registered user.
 }
 
 message LoginRequest {
